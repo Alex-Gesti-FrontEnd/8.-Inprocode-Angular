@@ -1,0 +1,84 @@
+<section class="container mt-4">
+  <div class="d-flex justify-content-between mb-3">
+    <h2 class="mb-3">Video Game Management</h2>
+    <button class="btn btn-success" (click)="toggleForm()">
+      {{ showForm() ? 'Close' : 'Add game' }}
+    </button>
+  </div>
+
+  @if (showForm()) {
+  <form [formGroup]="form" (ngSubmit)="addGame()" class="card p-4 mb-4">
+    <div class="d-flex gap-3 flex-wrap">
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Name</label>
+        <input formControlName="name" class="form-control" />
+      </div>
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Console</label>
+        <input formControlName="console" class="form-control" />
+      </div>
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Genre</label>
+        <input formControlName="genre" class="form-control" />
+      </div>
+    </div>
+
+    <div class="d-flex gap-3 flex-wrap mt-3">
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Release date</label>
+        <input type="date" formControlName="releaseDate" class="form-control" />
+      </div>
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Average price</label>
+        <input type="number" formControlName="avgPrice" class="form-control" />
+      </div>
+      <div class="flex-grow-1 flex-basis-30">
+        <label>Image (URL)</label>
+        <input formControlName="image" class="form-control" />
+      </div>
+    </div>
+
+    <button class="btn btn-primary mt-3" [disabled]="form.invalid">Guardar</button>
+  </form>
+  }
+
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Console</th>
+        <th>Genre</th>
+        <th>Release</th>
+        <th>Price</th>
+        <th>Image</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      @for (game of games(); track game.id) {
+      <tr>
+        <td>{{ game.id }}</td>
+        <td>{{ game.name }}</td>
+        <td>{{ game.console }}</td>
+        <td>{{ game.genre }}</td>
+        <td>{{ game.releaseDate }}</td>
+        <td>{{ game.avgPrice }}€</td>
+        <td>
+          <img
+            [src]="game.image"
+            width="50"
+            height="50"
+            style="object-fit: cover; border-radius: 4px"
+          />
+        </td>
+        <td>
+          <button class="btn btn-sm btn-warning me-2" (click)="editGame(game)">Edit</button>
+          <button class="btn btn-sm btn-danger" (click)="deleteGame(game.id!)">Del</button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+</section>
