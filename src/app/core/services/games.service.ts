@@ -22,6 +22,10 @@ export class GamesService {
     this.games.update((old) => [...old, newGame]);
   }
 
+  updateGame(id: number, updated: GameModel) {
+    this.games.update((list) => list.map((g) => (g.id === id ? { ...updated, id } : g)));
+  }
+
   deleteGame(id: number) {
     this.games.update((old) => old.filter((g) => g.id !== id));
   }
