@@ -1,32 +1,38 @@
 import { Injectable, signal } from '@angular/core';
 import { GameModel } from '../models/game.model';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GamesService {
-  games = signal<GameModel[]>([
-    {
-      id: 1,
-      name: 'Super Mario Odyssey',
-      console: 'Nintendo Switch',
-      genre: 'Platformer',
-      releaseDate: '2017-10-27',
-      avgPrice: 59.99,
-      image: 'https://m.media-amazon.com/images/I/91SF0Tzmv4L._AC_UF894,1000_QL80_.jpg',
-    },
-  ]);
+  games = signal<GameModel[]>([]);
+  private apiUrl = 'http://localhost:3000/api/games';
 
-  addGame(game: GameModel) {
-    const newGame = { ...game, id: Date.now() };
-    this.games.update((old) => [...old, newGame]);
+  constructor(private http: HttpClient) {}
+
+  fetchGames() {
+    this.http.get<GameModel[]>(this.apiUrl).subscribe((data) => {
+      this.games.set(data);
+    });
   }
 
-  updateGame(id: number, updated: GameModel) {
-    this.games.update((list) => list.map((g) => (g.id === id ? { ...updated, id } : g)));
+  addGame(game: GameModel) {
+    this.http.post<GameModel>(this.apiUrl, game).subscribe((newGame) => {
+      this.games.update((old) => [...old, newGame]);
+    });
+  }
+
+  updateGame(id: number, game: GameModel) {
+    this.http.put<GameModel>(`${this.apiUrl}/${id}`, game).subscribe((updatedGame) => {
+      this.games.update((list) => list.map((g) => (g.id === id ? updatedGame : g)));
+    });
   }
 
   deleteGame(id: number) {
-    this.games.update((old) => old.filter((g) => g.id !== id));
+    this.http.delete(`${this.apiUrl}/${id}`).subscribe(() => {
+      this.games.update((list) => list.filter((g) => g.id !== id));
+    });
   }
 }

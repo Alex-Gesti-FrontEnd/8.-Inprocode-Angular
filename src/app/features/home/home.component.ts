@@ -28,6 +28,10 @@ export class HomeComponent {
     image: [''],
   });
 
+  ngOnInit() {
+    this.gamesService.fetchGames();
+  }
+
   addGame() {
     if (this.form.invalid) return;
 
