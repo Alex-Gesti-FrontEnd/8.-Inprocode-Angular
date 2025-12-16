@@ -1,8 +1,29 @@
 import express from 'express';
 import { getConnection } from '../db.js';
+import { searchGameByName } from '../services/igdb.service.js';
 
 const router = express.Router();
 
+// Route to search for a game by name in IGDB
+router.get('/igdb/:name', async (req, res) => {
+  try {
+    const game = await searchGameByName(req.params.name);
+
+    if (!game) {
+      return res.status(404).json({ message: 'Game not found' });
+    }
+
+    res.json(game);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      message: 'IGDB error',
+      error: error.message,
+    });
+  }
+});
+
+// CRUD routes for local games database
 router.get('/', async (req, res) => {
   try {
     const connection = await getConnection();
