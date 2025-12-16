@@ -19,9 +19,11 @@ export class HomeComponent {
 
   editingId = signal<number | null>(null);
 
+  platforms = signal<string[]>([]);
+
   form = this.fb.group({
     name: ['', [Validators.required]],
-    console: ['', [Validators.required]],
+    platform: ['', [Validators.required]],
     genre: ['', [Validators.required]],
     releaseDate: ['', [Validators.required]],
     avgPrice: [0, [Validators.required]],
@@ -65,5 +67,24 @@ export class HomeComponent {
       this.editingId.set(null);
       this.form.reset();
     }
+  }
+
+  autoFillFromIGDB() {
+    const name = this.form.value.name;
+    if (!name) return;
+
+    this.gamesService.searchIGDB(name).subscribe((data) => {
+      this.platforms.set(data.platforms?.map((p: any) => p.name) ?? []);
+
+      this.form.patchValue({
+        name: data.name,
+        genre: data.genres?.[0]?.name ?? '',
+        releaseDate: data.first_release_date
+          ? new Date(data.first_release_date * 1000).toISOString().slice(0, 10)
+          : '',
+        image: data.cover ? `https:${data.cover.url.replace('t_thumb', 't_cover_big')}` : '',
+        platform: '',
+      });
+    });
   }
 }

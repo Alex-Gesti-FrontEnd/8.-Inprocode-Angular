@@ -35,4 +35,8 @@ export class GamesService {
       this.games.update((list) => list.filter((g) => g.id !== id));
     });
   }
+
+  searchIGDB(name: string) {
+    return this.http.get<any>(`${this.apiUrl}/igdb/${name}`);
+  }
 }

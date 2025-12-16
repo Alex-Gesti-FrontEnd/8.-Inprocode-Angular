@@ -37,48 +37,47 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, console, genre, releaseDate, avgPrice, image } = req.body;
+  const { name, platform, genre, releaseDate, avgPrice, image } = req.body;
   try {
     const connection = await getConnection();
     const [result] = await connection.query(
-      'INSERT INTO games (name, console, genre, releaseDate, avgPrice, image) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, console, genre, releaseDate, avgPrice, image]
+      'INSERT INTO games (name, platform, genre, releaseDate, avgPrice, image) VALUES (?, ?, ?, ?, ?, ?)',
+      [name, platform, genre, releaseDate, avgPrice, image]
     );
-    res.status(201).json({ id: result.insertId, ...req.body });
     await connection.end();
+    res.status(201).json({ id: result.insertId, ...req.body });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error adding game' });
+    res.status(500).json({ message: 'Error adding game', error: err.message });
   }
 });
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, console, genre, releaseDate, avgPrice, image } = req.body;
+  const { name, platform, genre, releaseDate, avgPrice, image } = req.body;
   try {
     const connection = await getConnection();
     await connection.query(
-      'UPDATE games SET name = ?, console = ?, genre = ?, releaseDate = ?, avgPrice = ?, image = ? WHERE id = ?',
-      [name, console, genre, releaseDate, avgPrice, image, id]
+      'UPDATE games SET name=?, platform=?, genre=?, releaseDate=?, avgPrice=?, image=? WHERE id=?',
+      [name, platform, genre, releaseDate, avgPrice, image, id]
     );
-    res.json({ id, ...req.body });
     await connection.end();
+    res.json({ id, ...req.body });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error updating game' });
+    res.status(500).json({ message: 'Error updating game', error: err.message });
   }
 });
 
 router.delete('/:id', async (req, res) => {
-  const { id } = req.params;
   try {
     const connection = await getConnection();
-    await connection.query('DELETE FROM games WHERE id = ?', [id]);
-    res.status(204).end();
+    await connection.query('DELETE FROM games WHERE id = ?', [req.params.id]);
     await connection.end();
+    res.status(204).send();
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Error deleting game' });
+    res.status(500).json({ message: 'Error deleting game', error: err.message });
   }
 });
 

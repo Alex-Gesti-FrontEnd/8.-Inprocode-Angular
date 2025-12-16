@@ -33,7 +33,12 @@ export async function searchGameByName(name) {
       Authorization: `Bearer ${token}`,
     },
     body: `
-      fields name, genres.name, first_release_date, cover.url;
+      fields 
+      name, 
+      genres.name, 
+      first_release_date, 
+      cover.url,
+      platforms.name;
       search "${name}";
       limit 1;
     `,
