@@ -16,7 +16,11 @@
       <div class="flex-grow-1 flex-basis-30">
         <label>Platform</label>
         @if (platforms().length > 0) {
-        <select formControlName="platform" class="form-select">
+        <select
+          formControlName="platform"
+          class="form-select"
+          (change)="onPlatformChange($any($event.target).value)"
+        >
           <option value="">Select platform</option>
           @for (p of platforms(); track p) {
           <option [value]="p">{{ p }}</option>

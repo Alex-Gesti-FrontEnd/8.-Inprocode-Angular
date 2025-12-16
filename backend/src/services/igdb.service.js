@@ -34,11 +34,12 @@ export async function searchGameByName(name) {
     },
     body: `
       fields 
-      name, 
-      genres.name, 
-      first_release_date, 
-      cover.url,
-      platforms.name;
+        name,
+        genres.name,
+        release_dates.platform.name,
+        release_dates.region,
+        release_dates.date,
+        cover.url;
       search "${name}";
       limit 1;
     `,

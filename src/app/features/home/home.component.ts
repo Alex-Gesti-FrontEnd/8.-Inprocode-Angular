@@ -20,6 +20,7 @@ export class HomeComponent {
   editingId = signal<number | null>(null);
 
   platforms = signal<string[]>([]);
+  platformsData = signal<{ platform: string; region: string; releaseDate: string }[]>([]);
 
   form = this.fb.group({
     name: ['', [Validators.required]],
@@ -74,17 +75,37 @@ export class HomeComponent {
     if (!name) return;
 
     this.gamesService.searchIGDB(name).subscribe((data) => {
-      this.platforms.set(data.platforms?.map((p: any) => p.name) ?? []);
+      type GameVersion = { platform: string; region: string; releaseDate: string };
+
+      const allVersions: GameVersion[] = (data.release_dates ?? []).map(
+        (r: any): GameVersion => ({
+          platform: r.platform?.name ?? '',
+          region: r.region ?? '',
+          releaseDate: r.date ? new Date(r.date * 1000).toISOString().slice(0, 10) : '',
+        })
+      );
+
+      const versions: GameVersion[] = allVersions.filter((v) => v.platform);
+      this.platformsData.set(versions);
+      this.platforms.set([...new Set(versions.map((v) => v.platform))]);
 
       this.form.patchValue({
         name: data.name,
         genre: data.genres?.[0]?.name ?? '',
-        releaseDate: data.first_release_date
-          ? new Date(data.first_release_date * 1000).toISOString().slice(0, 10)
-          : '',
+        releaseDate: '',
         image: data.cover ? `https:${data.cover.url.replace('t_thumb', 't_cover_big')}` : '',
         platform: '',
       });
     });
+  }
+
+  onPlatformChange(selected: string) {
+    const version = this.platformsData().find((v) => v.platform === selected);
+    if (version) {
+      this.form.patchValue({
+        platform: version.platform,
+        releaseDate: version.releaseDate,
+      });
+    }
   }
 }
