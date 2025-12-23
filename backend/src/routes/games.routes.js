@@ -37,12 +37,12 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, platform, genre, releaseDate, avgPrice, image } = req.body;
+  const { name, platform, region, genre, releaseDate, avgPrice, image } = req.body;
   try {
     const connection = await getConnection();
     const [result] = await connection.query(
-      'INSERT INTO games (name, platform, genre, releaseDate, avgPrice, image) VALUES (?, ?, ?, ?, ?, ?)',
-      [name, platform, genre, releaseDate, avgPrice, image]
+      'INSERT INTO games (name, platform, region, genre, releaseDate, avgPrice, image) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [name, platform, region, genre, releaseDate, avgPrice, image]
     );
     await connection.end();
     res.status(201).json({ id: result.insertId, ...req.body });
@@ -54,12 +54,12 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
-  const { name, platform, genre, releaseDate, avgPrice, image } = req.body;
+  const { name, platform, region, genre, releaseDate, avgPrice, image } = req.body;
   try {
     const connection = await getConnection();
     await connection.query(
-      'UPDATE games SET name=?, platform=?, genre=?, releaseDate=?, avgPrice=?, image=? WHERE id=?',
-      [name, platform, genre, releaseDate, avgPrice, image, id]
+      'UPDATE games SET name=?, platform=?, region=?, genre=?, releaseDate=?, avgPrice=?, image=? WHERE id=?',
+      [name, platform, region, genre, releaseDate, avgPrice, image, id]
     );
     await connection.end();
     res.json({ id, ...req.body });

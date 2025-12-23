@@ -16,15 +16,16 @@ export class HomeComponent {
   showForm = signal(false);
 
   games = this.gamesService.games;
-
   editingId = signal<number | null>(null);
 
   platforms = signal<string[]>([]);
   platformsData = signal<{ platform: string; region: string; releaseDate: string }[]>([]);
+  regions = signal<string[]>(['PAL', 'NTSC-U', 'NTSC-J', 'Worldwide']);
 
   form = this.fb.group({
     name: ['', [Validators.required]],
     platform: ['', [Validators.required]],
+    region: ['', [Validators.required]],
     genre: ['', [Validators.required]],
     releaseDate: ['', [Validators.required]],
     avgPrice: [0, [Validators.required]],
@@ -47,8 +48,7 @@ export class HomeComponent {
       this.gamesService.addGame(gameData);
     }
 
-    this.form.reset();
-    this.showForm.set(false);
+    this.resetForm();
   }
 
   editGame(game: GameModel) {
@@ -63,11 +63,14 @@ export class HomeComponent {
 
   toggleForm() {
     this.showForm.update((v) => !v);
+    if (!this.showForm()) this.resetForm();
+  }
 
-    if (!this.showForm()) {
-      this.editingId.set(null);
-      this.form.reset();
-    }
+  private resetForm() {
+    this.editingId.set(null);
+    this.form.reset();
+    this.platforms.set([]);
+    this.platformsData.set([]);
   }
 
   autoFillFromIGDB() {
@@ -86,15 +89,17 @@ export class HomeComponent {
       );
 
       const versions: GameVersion[] = allVersions.filter((v) => v.platform);
+
       this.platformsData.set(versions);
       this.platforms.set([...new Set(versions.map((v) => v.platform))]);
 
       this.form.patchValue({
         name: data.name,
-        genre: data.genres?.[0]?.name ?? '',
+        genre: data.genres?.map((g: any) => g.name).join(', ') ?? '',
         releaseDate: '',
         image: data.cover ? `https:${data.cover.url.replace('t_thumb', 't_cover_big')}` : '',
         platform: '',
+        region: '',
       });
     });
   }
@@ -107,5 +112,9 @@ export class HomeComponent {
         releaseDate: version.releaseDate,
       });
     }
+  }
+
+  onRegionChange(selected: string) {
+    this.form.patchValue({ region: selected });
   }
 }

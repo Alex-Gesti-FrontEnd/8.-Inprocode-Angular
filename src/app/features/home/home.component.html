@@ -31,6 +31,19 @@
         }
       </div>
       <div class="flex-grow-1 flex-basis-30">
+        <label>Region</label>
+        <select
+          formControlName="region"
+          class="form-select"
+          (change)="onRegionChange($any($event.target).value)"
+        >
+          <option value="">Select region</option>
+          @for (r of regions(); track r) {
+          <option [value]="r">{{ r }}</option>
+          }
+        </select>
+      </div>
+      <div class="flex-grow-1 flex-basis-30">
         <label>Genre</label>
         <input formControlName="genre" class="form-control" />
       </div>
@@ -69,6 +82,7 @@
         <th>ID</th>
         <th>Name</th>
         <th>Platform</th>
+        <th>Region</th>
         <th>Genre</th>
         <th>Release</th>
         <th>Price</th>
@@ -83,6 +97,7 @@
         <td>{{ game.id }}</td>
         <td>{{ game.name }}</td>
         <td>{{ game.platform }}</td>
+        <td>{{ game.region }}</td>
         <td>{{ game.genre }}</td>
         <td>{{ game.releaseDate }}</td>
         <td>{{ game.avgPrice }}€</td>
