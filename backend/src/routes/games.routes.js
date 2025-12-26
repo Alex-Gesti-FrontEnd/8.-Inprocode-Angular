@@ -1,6 +1,7 @@
 import express from 'express';
 import { getConnection } from '../db.js';
 import { searchGameByName } from '../services/igdb.service.js';
+import { fetchGamePrices } from '../services/pricecharting.service.js';
 
 const router = express.Router();
 
@@ -78,6 +79,34 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Error deleting game', error: err.message });
+  }
+});
+
+// Route to fetch and store game prices from PriceCharting
+router.post('/:id/prices', async (req, res) => {
+  const { id } = req.params;
+  const { loose_price, cib_price, avg_price, source } = req.body;
+
+  try {
+    const connection = await getConnection();
+
+    await connection.query(
+      `
+      INSERT INTO game_prices
+      (game_id, loose_price, cib_price, avg_price, source, checked_at)
+      VALUES (?, ?, ?, ?, ?, CURDATE())
+      `,
+      [id, loose_price, cib_price, avg_price, source]
+    );
+
+    await connection.end();
+    res.status(201).json({ message: 'Price saved' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: 'Error saving price',
+      error: err.message,
+    });
   }
 });
 
