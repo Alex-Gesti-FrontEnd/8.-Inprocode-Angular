@@ -1,25 +1,31 @@
 import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
-export async function scrapePriceCharting(slug) {
-  const url = `https://www.pricecharting.com/game/${slug}`;
+export async function scrapePriceCharting(slug, platform) {
+  if (!slug) throw new Error('Slug is required for PriceCharting');
 
-  const res = await fetch(url);
-  if (!res.ok) throw new Error('PriceCharting not reachable');
+  const url = `https://www.pricecharting.com/game/${platform.toLowerCase()}/${slug}`;
 
-  const html = await res.text();
+  console.log('Scraping:', url);
+
+  const response = await fetch(url);
+  if (!response.ok) throw new Error('PriceCharting page not found');
+
+  const html = await response.text();
   const $ = cheerio.load(html);
 
-  const loose = $('#used_price span.price').first().text();
-  const cib = $('#complete_price span.price').first().text();
+  const loose = $('#used_price .price').first().text();
+  const cib = $('#complete_price .price').first().text();
+
+  const parsePrice = (text) => (text ? parseFloat(text.replace('$', '').replace(',', '')) : null);
 
   return {
-    loose: parsePrice(loose),
-    cib: parsePrice(cib),
+    loose_price: parsePrice(loose),
+    cib_price: parsePrice(cib),
+    avg_price:
+      loose && cib
+        ? (parsePrice(loose) + parsePrice(cib)) / 2
+        : parsePrice(loose) || parsePrice(cib),
+    source: 'pricecharting',
   };
-}
-
-function parsePrice(text) {
-  if (!text) return null;
-  return Number(text.replace('$', '').replace(',', '').trim());
 }

@@ -1,18 +1,23 @@
 import { scrapePriceCharting } from '../scrapers/pricecharting.scraper.js';
+import { getConnection } from '../db.js';
 
-export async function fetchGamePrices(slug) {
-  const prices = await scrapePriceCharting(slug);
+export async function fetchGamePrices(gameId, slug, platform) {
+  if (!slug) throw new Error('Slug missing for PriceCharting');
 
-  let avg = null;
-  if (prices.loose && prices.cib) {
-    avg = (prices.loose + prices.cib) / 2;
-  }
+  const prices = await scrapePriceCharting(slug, platform);
 
-  return {
-    loose_price: prices.loose,
-    cib_price: prices.cib,
-    avg_price: avg,
-    source: 'pricecharting',
-    checked_at: new Date(),
-  };
+  const connection = await getConnection();
+
+  await connection.query(
+    `
+    INSERT INTO games_prices
+    (game_id, loose_price, cib_price, avg_price, source, checked_at)
+    VALUES (?, ?, ?, ?, ?, NOW())
+    `,
+    [gameId, prices.loose_price, prices.cib_price, prices.avg_price, prices.source]
+  );
+
+  await connection.end();
+
+  return prices;
 }
