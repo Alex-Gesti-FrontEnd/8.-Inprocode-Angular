@@ -6,7 +6,7 @@ import { GameModel } from '../models/game.model';
   providedIn: 'root',
 })
 export class GamesService {
-  private apiUrl = 'http://localhost:3000/api/games';
+  private apiUrl = 'https://8-inprocode-angular-production.up.railway.app/api/games';
 
   games = signal<GameModel[]>([]);
 

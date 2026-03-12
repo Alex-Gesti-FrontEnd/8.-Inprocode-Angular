@@ -9,7 +9,7 @@ export class ReminderService {
   private _reminders = signal<Reminder[]>([]);
   reminders = this._reminders.asReadonly();
 
-  private apiUrl = 'http://localhost:3000/api/reminders';
+  private apiUrl = 'https://8-inprocode-angular-production.up.railway.app/api/reminders';
 
   load() {
     this.http.get<Reminder[]>(this.apiUrl).subscribe((r) => this._reminders.set(r));

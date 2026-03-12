@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class MapService {
-  private api = 'http://localhost:3000/api/games';
+  private api = 'https://8-inprocode-angular-production.up.railway.app/api/games';
 
   constructor(private http: HttpClient) {}
 

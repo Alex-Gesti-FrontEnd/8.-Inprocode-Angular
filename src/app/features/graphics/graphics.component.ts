@@ -68,7 +68,9 @@ export class GraphicsComponent implements OnInit {
 
   async loadGames() {
     try {
-      const games = await firstValueFrom(this.http.get<Game[]>('http://localhost:3000/api/games'));
+      const games = await firstValueFrom(
+        this.http.get<Game[]>('https://8-inprocode-angular-production.up.railway.app/api/games'),
+      );
       this.games.set(games);
     } catch (err) {
       console.error('Error loading games:', err);
@@ -88,7 +90,7 @@ export class GraphicsComponent implements OnInit {
     try {
       const prices = await firstValueFrom(
         this.http.get<number[]>(
-          `http://localhost:3000/api/games/ebay-prices?name=${encodeURIComponent(game.name)}&platform=${encodeURIComponent(game.platform)}&region=${encodeURIComponent(game.region)}`,
+          `https://8-inprocode-angular-production.up.railway.app/api/games/ebay-prices?name=${encodeURIComponent(game.name)}&platform=${encodeURIComponent(game.platform)}&region=${encodeURIComponent(game.region)}`,
         ),
       );
 
